@@ -96,19 +96,20 @@
                 <label>Class folder<select id="noteFolder" name="folder_id"></select></label>
             </div>
             <div class="drawingToolbar" aria-label="Note page tools">
-                <div class="toolModeGroup" role="group" aria-label="Editing mode">
-                    <button class="toolButton" type="button" data-mode="text" aria-pressed="false" aria-label="Text box tool">▧ Text box</button>
-                    <button class="toolButton" type="button" data-mode="draw" aria-pressed="false">Draw</button>
+                <div class="toolModeGroup" id="noteToolGroup" role="group" aria-label="Editing tools">
+                    <button class="toolButton" type="button" data-tool="select" aria-pressed="true" aria-keyshortcuts="1" title="Select (1)"><kbd>1</kbd> Select</button>
+                    <button class="toolButton" type="button" data-tool="arrow" aria-pressed="false" aria-keyshortcuts="2" title="Arrow (2)"><kbd>2</kbd> Arrow</button>
+                    <button class="toolButton" type="button" data-tool="rectangle" aria-pressed="false" aria-keyshortcuts="3" title="Rectangle shape (3)"><kbd>3</kbd> Rectangle</button>
+                    <button class="toolButton" type="button" data-tool="text" aria-pressed="false" aria-keyshortcuts="4" title="Text box (4)"><kbd>4</kbd> Text box</button>
+                    <button class="toolButton" type="button" data-tool="pen" aria-pressed="false" aria-keyshortcuts="5" title="Pen (5)"><kbd>5</kbd> Pen</button>
+                    <button class="toolButton" type="button" data-tool="line" aria-pressed="false" aria-keyshortcuts="6" title="Line (6)"><kbd>6</kbd> Line</button>
+                    <button class="toolButton" type="button" data-tool="ellipse" aria-pressed="false" aria-keyshortcuts="7" title="Ellipse shape (7)"><kbd>7</kbd> Ellipse</button>
+                    <button class="toolButton" type="button" data-tool="eraser" aria-pressed="false" aria-keyshortcuts="8" title="Eraser (8)"><kbd>8</kbd> Eraser</button>
                 </div>
-                <span class="toolHint">Choose Text box, then click on the page to place it.</span>
-                <label class="toolSelectLabel">Tool
-                    <select id="drawingTool">
-                        <option value="pen">Pen</option>
-                        <option value="line">Line</option>
-                        <option value="arrow">Arrow</option>
-                        <option value="rectangle">Rectangle</option>
-                        <option value="ellipse">Ellipse</option>
-                    </select>
+                <span class="toolHint" id="toolHint">Choose Text box, then click the page once to place a box.</span>
+                <label class="toolRadiusControl" id="eraserRadiusControl" hidden>
+                    Eraser radius <input id="eraserRadius" type="range" min="6" max="80" step="2" value="24" aria-label="Eraser radius">
+                    <output id="eraserRadiusValue" for="eraserRadius">24 px</output>
                 </label>
                 <label class="toolSelectLabel">Line
                     <select id="drawingStyle">
@@ -121,9 +122,10 @@
                 <button class="toolButton" id="undoDrawing" type="button">Undo</button>
                 <button class="toolButton" id="clearDrawings" type="button">Clear</button>
             </div>
-            <div class="editorWorkspace" id="editorWorkspace" data-mode="select" aria-label="Note page canvas">
+            <div class="editorWorkspace" id="editorWorkspace" data-tool="select" aria-label="Note page canvas">
                 <div class="textBoxLayer" id="textBoxLayer" aria-label="Text boxes"></div>
-                <canvas id="noteCanvas" aria-label="Drawing canvas. Select Draw to add shapes and arrows."></canvas>
+                <canvas id="noteCanvas" aria-label="Drawing canvas. Select a drawing tool to add or erase items."></canvas>
+                <div class="eraserCursor" id="eraserCursor" aria-hidden="true"></div>
             </div>
             <div class="editorFooter">
                 <p class="hubError" id="editorError" role="alert"></p>

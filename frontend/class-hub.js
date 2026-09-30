@@ -9,6 +9,8 @@ const noteEditorForm = document.getElementById("noteEditorForm");
 const noteFolderSelect = document.getElementById("noteFolder");
 const noteCanvas = document.getElementById("noteCanvas");
 const textBoxLayer = document.getElementById("textBoxLayer");
+const eraserCursor = document.getElementById("eraserCursor");
+const eraserRadiusInput = document.getElementById("eraserRadius");
 const canvasContext = noteCanvas.getContext("2d");
 const editorWorkspace = document.getElementById("editorWorkspace");
 const weekTasksList = document.getElementById("weekTasksList");
@@ -20,7 +22,9 @@ let selectedFolderFilter = "all";
 let selectedNote = null;
 let drawings = [];
 let activeDrawing = null;
-let currentMode = "select";
+let currentTool = "select";
+let eraserPointerId = null;
+let previousEraserPoint = null;
 
 async function apiRequest(path, options = {}) {
     if (!token) throw new Error("Please log in to use Class Hub.");
@@ -353,7 +357,7 @@ function openNoteEditor(note = null) {
     document.getElementById("noteSequence").value = note?.sequence || nextSequence();
     populateFolderSelect(note?.folder_id || (selectedFolderFilter !== "all" && selectedFolderFilter !== "unfiled" ? selectedFolderFilter : null));
     document.getElementById("deleteNoteButton").hidden = !note;
-    setEditorMode("select");
+    setEditorTool("select");
     noteEditorDialog.showModal();
     resizeCanvas();
     document.getElementById("noteTitle").focus();
@@ -389,18 +393,35 @@ async function moveNote(note, folderId) {
     }
 }
 
-function setEditorMode(mode) {
-    currentMode = mode;
-    editorWorkspace.dataset.mode = mode;
-    document.querySelectorAll("[data-mode]").forEach((button) => {
-        const active = button.dataset.mode === mode;
+function setEditorTool(tool) {
+    currentTool = tool;
+    editorWorkspace.dataset.tool = tool;
+    document.getElementById("eraserRadiusControl").hidden = tool !== "eraser";
+    document.getElementById("toolHint").textContent = tool === "text"
+        ? "Click the page once to place a text box."
+        : tool === "eraser"
+            ? "Drag to erase complete items within the adjustable radius."
+            : tool === "select"
+                ? "Select a tool or press its number key (1–8)."
+                : `Drag on the page to draw with ${tool}.`;
+    if (tool !== "eraser") eraserCursor.hidden = true;
+    document.querySelectorAll("#noteToolGroup [data-tool]").forEach((button) => {
+        const active = button.dataset.tool === tool;
         button.classList.toggle("isActive", active);
         button.setAttribute("aria-pressed", String(active));
     });
 }
 
-document.querySelectorAll("[data-mode]").forEach((button) => {
-    button.addEventListener("click", () => setEditorMode(button.dataset.mode));
+document.querySelectorAll("#noteToolGroup [data-tool]").forEach((button) => {
+    button.addEventListener("click", () => setEditorTool(button.dataset.tool));
+});
+
+noteEditorDialog.addEventListener("keydown", (event) => {
+    if (event.altKey || event.ctrlKey || event.metaKey || event.target.closest("input, textarea, select, [contenteditable='true']")) return;
+    const toolButton = document.querySelector(`#noteToolGroup [data-tool][aria-keyshortcuts="${event.key}"]`);
+    if (!toolButton) return;
+    event.preventDefault();
+    setEditorTool(toolButton.dataset.tool);
 });
 
 function resizeCanvas() {
@@ -419,6 +440,133 @@ function drawingPoint(event) {
         x: Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width)),
         y: Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height)),
     };
+}
+
+function updateEraserCursor(event) {
+    const rect = editorWorkspace.getBoundingClientRect();
+    const diameter = Number(eraserRadiusInput.value) * 2;
+    eraserCursor.style.width = `${diameter}px`;
+    eraserCursor.style.height = `${diameter}px`;
+    eraserCursor.style.left = `${event.clientX - rect.left}px`;
+    eraserCursor.style.top = `${event.clientY - rect.top}px`;
+    eraserCursor.hidden = false;
+}
+
+function drawingSegments(element) {
+    const width = noteCanvas.clientWidth;
+    const height = noteCanvas.clientHeight;
+    const points = element.points.map((point) => ({ x: point.x * width, y: point.y * height }));
+    if (points.length === 0) return [];
+    if (element.kind === "rectangle" && points.length >= 2) {
+        const [start, end] = points;
+        const topLeft = { x: Math.min(start.x, end.x), y: Math.min(start.y, end.y) };
+        const bottomRight = { x: Math.max(start.x, end.x), y: Math.max(start.y, end.y) };
+        const corners = [
+            topLeft,
+            { x: bottomRight.x, y: topLeft.y },
+            bottomRight,
+            { x: topLeft.x, y: bottomRight.y },
+            topLeft,
+        ];
+        return corners.slice(1).map((point, index) => [corners[index], point]);
+    }
+    if (element.kind === "ellipse" && points.length >= 2) {
+        const [start, end] = points;
+        const center = { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+        const radiusX = Math.abs(end.x - start.x) / 2;
+        const radiusY = Math.abs(end.y - start.y) / 2;
+        const ellipsePoints = Array.from({ length: 49 }, (_, index) => {
+            const angle = (index / 48) * Math.PI * 2;
+            return { x: center.x + radiusX * Math.cos(angle), y: center.y + radiusY * Math.sin(angle) };
+        });
+        return ellipsePoints.slice(1).map((point, index) => [ellipsePoints[index], point]);
+    }
+    if (points.length === 1) return [[points[0], points[0]]];
+    return points.slice(1).map((point, index) => [points[index], point]);
+}
+
+function pointToSegmentDistance(point, start, end) {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const lengthSquared = dx * dx + dy * dy;
+    const t = lengthSquared === 0
+        ? 0
+        : Math.min(1, Math.max(0, ((point.x - start.x) * dx + (point.y - start.y) * dy) / lengthSquared));
+    return Math.hypot(point.x - (start.x + t * dx), point.y - (start.y + t * dy));
+}
+
+function segmentsIntersect(a, b, c, d) {
+    const cross = (first, second, third) =>
+        (second.x - first.x) * (third.y - first.y) - (second.y - first.y) * (third.x - first.x);
+    const abC = cross(a, b, c);
+    const abD = cross(a, b, d);
+    const cdA = cross(c, d, a);
+    const cdB = cross(c, d, b);
+    const onSegment = (start, point, end) =>
+        point.x >= Math.min(start.x, end.x) && point.x <= Math.max(start.x, end.x)
+        && point.y >= Math.min(start.y, end.y) && point.y <= Math.max(start.y, end.y);
+    if (abC === 0 && onSegment(a, c, b)) return true;
+    if (abD === 0 && onSegment(a, d, b)) return true;
+    if (cdA === 0 && onSegment(c, a, d)) return true;
+    if (cdB === 0 && onSegment(c, b, d)) return true;
+    return abC * abD < 0 && cdA * cdB < 0;
+}
+
+function segmentToSegmentDistance(a, b, c, d) {
+    if (segmentsIntersect(a, b, c, d)) return 0;
+    return Math.min(
+        pointToSegmentDistance(a, c, d),
+        pointToSegmentDistance(b, c, d),
+        pointToSegmentDistance(c, a, b),
+        pointToSegmentDistance(d, a, b),
+    );
+}
+
+function eraserTouchesTextBox(element, start, end, radius) {
+    const width = noteCanvas.clientWidth;
+    const height = noteCanvas.clientHeight;
+    const point = element.points[0];
+    const left = point.x * width;
+    const top = point.y * height;
+    const right = left + (element.width || 220 / width) * width;
+    const bottom = top + (element.height || 72 / height) * height;
+    const closestPoint = (candidate) => ({
+        x: Math.min(right, Math.max(left, candidate.x)),
+        y: Math.min(bottom, Math.max(top, candidate.y)),
+    });
+    if (start.x >= left && start.x <= right && start.y >= top && start.y <= bottom) return true;
+    if (end.x >= left && end.x <= right && end.y >= top && end.y <= bottom) return true;
+    const corners = [
+        { x: left, y: top },
+        { x: right, y: top },
+        { x: right, y: bottom },
+        { x: left, y: bottom },
+        { x: left, y: top },
+    ];
+    if (corners.slice(1).some((corner, index) => segmentsIntersect(start, end, corners[index], corner))) return true;
+    return [start, end].some((candidate) => {
+        const nearest = closestPoint(candidate);
+        return Math.hypot(candidate.x - nearest.x, candidate.y - nearest.y) <= radius;
+    });
+}
+
+function eraseAlongSegment(start, end) {
+    const radius = Number(eraserRadiusInput.value);
+    const workspaceRect = editorWorkspace.getBoundingClientRect();
+    const canvasRect = noteCanvas.getBoundingClientRect();
+    const canvasLeft = canvasRect.left - workspaceRect.left;
+    const canvasTop = canvasRect.top - workspaceRect.top;
+    const startInCanvas = { x: start.x - canvasLeft, y: start.y - canvasTop };
+    const endInCanvas = { x: end.x - canvasLeft, y: end.y - canvasTop };
+    const remaining = drawings.filter((element) => {
+        if (element.kind === "text") return !eraserTouchesTextBox(element, startInCanvas, endInCanvas, radius);
+        return !drawingSegments(element).some(([segmentStart, segmentEnd]) =>
+            segmentToSegmentDistance(startInCanvas, endInCanvas, segmentStart, segmentEnd) <= radius);
+    });
+    if (remaining.length !== drawings.length) {
+        drawings = remaining;
+        renderDrawings();
+    }
 }
 
 function drawElement(element) {
@@ -569,7 +717,7 @@ function startTextBoxResize(event, index, corner) {
 }
 
 editorWorkspace.addEventListener("click", (event) => {
-    if (currentMode !== "text" || event.target !== editorWorkspace) return;
+    if (currentTool !== "text" || (event.target !== editorWorkspace && event.target !== noteCanvas)) return;
     if (drawings.length >= 300) {
         document.getElementById("editorError").textContent = "This page has reached the 300-item limit.";
         return;
@@ -587,18 +735,27 @@ editorWorkspace.addEventListener("click", (event) => {
         height: Math.min(72, rect.height - y * rect.height) / rect.height,
         font_scale: 1,
     });
+    setEditorTool("select");
     renderTextBoxes();
     textBoxLayer.lastElementChild.focus();
 });
 
 noteCanvas.addEventListener("pointerdown", (event) => {
-    if (currentMode !== "draw") return;
+    if (currentTool === "eraser") {
+        event.preventDefault();
+        noteCanvas.setPointerCapture(event.pointerId);
+        eraserPointerId = event.pointerId;
+        previousEraserPoint = { x: event.clientX - editorWorkspace.getBoundingClientRect().left, y: event.clientY - editorWorkspace.getBoundingClientRect().top };
+        updateEraserCursor(event);
+        eraseAlongSegment(previousEraserPoint, previousEraserPoint);
+        return;
+    }
+    if (currentTool === "select" || currentTool === "text") return;
     event.preventDefault();
     noteCanvas.setPointerCapture(event.pointerId);
-    const kind = document.getElementById("drawingTool").value;
     const point = drawingPoint(event);
     activeDrawing = {
-        kind,
+        kind: currentTool,
         color: document.getElementById("drawingColor").value,
         line_style: document.getElementById("drawingStyle").value,
         points: [point],
@@ -606,12 +763,39 @@ noteCanvas.addEventListener("pointerdown", (event) => {
     renderDrawings();
 });
 noteCanvas.addEventListener("pointermove", (event) => {
+    if (currentTool === "eraser") {
+        updateEraserCursor(event);
+        if (eraserPointerId === event.pointerId && previousEraserPoint) {
+            const point = { x: event.clientX - editorWorkspace.getBoundingClientRect().left, y: event.clientY - editorWorkspace.getBoundingClientRect().top };
+            eraseAlongSegment(previousEraserPoint, point);
+            previousEraserPoint = point;
+        }
+        return;
+    }
     if (!activeDrawing) return;
     const point = drawingPoint(event);
     if (activeDrawing.kind === "pen") activeDrawing.points.push(point);
     else if (activeDrawing.points.length === 1) activeDrawing.points.push(point);
     else activeDrawing.points[1] = point;
     renderDrawings();
+});
+noteCanvas.addEventListener("pointerenter", (event) => {
+    if (currentTool === "eraser") updateEraserCursor(event);
+});
+noteCanvas.addEventListener("pointerleave", () => {
+    if (eraserPointerId === null) eraserCursor.hidden = true;
+});
+function finishErasing(event) {
+    if (eraserPointerId !== event.pointerId) return;
+    eraserPointerId = null;
+    previousEraserPoint = null;
+}
+noteCanvas.addEventListener("pointerup", finishErasing);
+noteCanvas.addEventListener("pointercancel", finishErasing);
+eraserRadiusInput.addEventListener("input", () => {
+    document.getElementById("eraserRadiusValue").value = `${eraserRadiusInput.value} px`;
+    eraserCursor.style.width = `${Number(eraserRadiusInput.value) * 2}px`;
+    eraserCursor.style.height = `${Number(eraserRadiusInput.value) * 2}px`;
 });
 function finishDrawing() {
     if (!activeDrawing) return;

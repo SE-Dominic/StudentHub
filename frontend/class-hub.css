@@ -95,11 +95,16 @@
 .noteMetadata { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(100px, .55fr) minmax(180px, 1fr); gap: 12px; }
 .drawingToolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 9px; border: 1px solid var(--line); border-radius: 11px; background: #fff; }
 .toolModeGroup { display: flex; gap: 3px; padding: 3px; border-radius: 8px; background: #f0f2f7; }
-.toolButton { min-height: 32px; padding: 0 10px; border-radius: 7px; color: #657286; background: transparent; font: inherit; font-size: 11px; font-weight: 700; }
+.toolButton { min-height: 32px; padding: 0 9px; border-radius: 7px; color: #657286; background: transparent; font: inherit; font-size: 11px; font-weight: 700; }
 .toolButton:hover { color: var(--ink); background: #f0f2f7; }
 .toolModeGroup .toolButton.isActive { color: #573b8b; background: #fff; box-shadow: 0 1px 4px #d8dce5; }
+.toolButton kbd { display: inline-grid; min-width: 16px; height: 16px; place-items: center; margin-right: 3px; border-radius: 4px; color: #7d6a9d; background: #f0eaff; font-family: inherit; font-size: 10px; font-weight: 700; }
 .toolHint { color: #8995a6; font-size: 10px; }
 .toolSelectLabel, .toolColorLabel { display: inline-flex; align-items: center; gap: 6px; color: #657286; font-size: 10px; font-weight: 750; }
+.toolRadiusControl { display: inline-flex; align-items: center; gap: 6px; color: #657286; font-size: 10px; font-weight: 750; }
+.toolRadiusControl[hidden] { display: none; }
+.toolRadiusControl input { width: 100px; accent-color: #7550b5; }
+.toolRadiusControl output { min-width: 34px; color: var(--muted); font-size: 10px; }
 .toolSelectLabel select { width: auto; height: 32px; padding: 0 7px; font-size: 11px; }
 .toolColorLabel input { width: 30px; height: 30px; padding: 2px; border: 1px solid var(--line); border-radius: 7px; background: #fff; cursor: pointer; }
 .editorWorkspace { position: relative; width: 100%; height: min(55vh, 560px); min-height: 300px; overflow: hidden; border: 1px solid #e0e4ed; border-radius: 3px; background-color: #fff; background-image: linear-gradient(to bottom, transparent 31px, #edf1f8 32px); background-size: 100% 32px; box-shadow: 0 6px 18px rgba(34, 49, 76, .07); }
@@ -116,13 +121,15 @@
 .textBoxResizeHandle[data-corner="ne"] { top: -6px; right: -6px; cursor: nesw-resize; }
 .textBoxResizeHandle[data-corner="sw"] { bottom: -6px; left: -6px; cursor: nesw-resize; }
 .textBoxResizeHandle[data-corner="se"] { right: -6px; bottom: -6px; cursor: nwse-resize; }
-.editorWorkspace[data-mode="text"] { cursor: text; }
-.editorWorkspace[data-mode="select"] { cursor: default; }
-.editorWorkspace[data-mode="draw"] { cursor: crosshair; }
-.editorWorkspace[data-mode="draw"] .placedTextBox, .editorWorkspace[data-mode="select"] .placedTextBox { pointer-events: none; }
-.editorWorkspace[data-mode="draw"] .textBoxResizeHandle, .editorWorkspace[data-mode="select"] .textBoxResizeHandle { display: none; }
+.editorWorkspace[data-tool="text"] { cursor: text; }
+.editorWorkspace[data-tool="select"] { cursor: default; }
+.editorWorkspace[data-tool="pen"], .editorWorkspace[data-tool="line"], .editorWorkspace[data-tool="arrow"], .editorWorkspace[data-tool="rectangle"], .editorWorkspace[data-tool="ellipse"], .editorWorkspace[data-tool="eraser"] { cursor: crosshair; }
+.editorWorkspace[data-tool="pen"] .placedTextBox, .editorWorkspace[data-tool="line"] .placedTextBox, .editorWorkspace[data-tool="arrow"] .placedTextBox, .editorWorkspace[data-tool="rectangle"] .placedTextBox, .editorWorkspace[data-tool="ellipse"] .placedTextBox, .editorWorkspace[data-tool="eraser"] .placedTextBox { pointer-events: none; }
+.editorWorkspace[data-tool="pen"] .textBoxResizeHandle, .editorWorkspace[data-tool="line"] .textBoxResizeHandle, .editorWorkspace[data-tool="arrow"] .textBoxResizeHandle, .editorWorkspace[data-tool="rectangle"] .textBoxResizeHandle, .editorWorkspace[data-tool="ellipse"] .textBoxResizeHandle, .editorWorkspace[data-tool="eraser"] .textBoxResizeHandle { display: none; }
 .editorWorkspace canvas { position: absolute; z-index: 3; inset: 0; width: 100%; height: 100%; touch-action: none; pointer-events: none; }
-.editorWorkspace[data-mode="draw"] canvas { cursor: crosshair; pointer-events: auto; }
+.editorWorkspace[data-tool="pen"] canvas, .editorWorkspace[data-tool="line"] canvas, .editorWorkspace[data-tool="arrow"] canvas, .editorWorkspace[data-tool="rectangle"] canvas, .editorWorkspace[data-tool="ellipse"] canvas, .editorWorkspace[data-tool="eraser"] canvas { cursor: crosshair; pointer-events: auto; }
+.eraserCursor { position: absolute; z-index: 4; border: 1px solid #7550b5; border-radius: 50%; background: rgba(117, 80, 181, .12); pointer-events: none; transform: translate(-50%, -50%); }
+.eraserCursor[hidden] { display: none; }
 .editorFooter { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 0 12px; }
 .editorFooter .hubError { grid-column: 1 / -1; }
 .saveStatus { margin: 0; color: #8995a6; font-size: 11px; }
