@@ -1,0 +1,147 @@
+:root {
+    --ink: #202c3d;
+    --muted: #708096;
+    --line: #e6ebf2;
+    --surface: #ffffff;
+    --background: #f5f8fc;
+    --blue: #4f77d9;
+    --blue-dark: #385bb3;
+    --mint: #dff5ee;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--ink); background: var(--background); }
+.siteHeader { max-width: 1180px; margin: 0 auto; padding: 36px 32px 28px; display: flex; align-items: center; justify-content: space-between; }
+.brand { display: flex; align-items: center; gap: 16px; }
+#bookButton { width: 58px; height: 58px; object-fit: contain; cursor: pointer; }
+.headerActions { display: flex; align-items: center; gap: 18px; }
+.classHubButton { display: inline-flex; align-items: center; gap: 9px; padding: 12px 18px; border-radius: 12px; color: #fff; background: #8257c5; box-shadow: 0 7px 18px rgba(105, 71, 163, .23); font-size: 13px; font-weight: 800; text-decoration: none; transition: transform .18s ease, background .18s ease; }
+.classHubButton:hover { color: #fff; background: #6d43b2; transform: translateY(-1px); }
+.classHubButton span { font-size: 17px; }
+.eyebrow { color: var(--blue); font-size: 11px; font-weight: 800; letter-spacing: .13em; margin: 0 0 5px; }
+h1, h2, p { margin-top: 0; }
+h1 { font-size: clamp(30px, 4vw, 43px); letter-spacing: -.04em; margin: 0; }
+h2 { font-size: 22px; letter-spacing: -.03em; margin: 0; }
+.headerDate { color: var(--muted); font-size: 14px; margin: 0; }
+.dashboard { max-width: 1180px; margin: 0 auto; padding: 0 32px 48px; display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1.5fr); gap: 20px; }
+.studentInfoBlock { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 26px; box-shadow: 0 10px 28px rgba(38, 58, 92, .05); }
+.progressCard { grid-column: 1 / -1; background: #eef3ff; border-color: #dce6ff; }
+.cardHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.progressPercent { color: var(--blue-dark); font-size: 28px; font-weight: 800; }
+.progressSummary, .progressMessage { color: var(--muted); font-size: 14px; margin: 22px 0 10px; }
+.progressMessage { margin: 12px 0 0; font-size: 13px; }
+.progressTrack { height: 11px; border-radius: 20px; background: #d8e1f5; overflow: hidden; }
+.progressTrack span { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #6389e8, #6bcfb0); transition: width .3s ease; }
+.taskCount { color: var(--muted); font-size: 13px; }
+.taskForm { display: flex; gap: 9px; margin: 22px 0 18px; }
+.taskForm input { min-width: 0; flex: 1; border: 1px solid var(--line); border-radius: 9px; padding: 12px 13px; color: var(--ink); font: inherit; outline: none; }
+.taskForm input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px #e7edff; }
+button { border: 0; border-radius: 9px; padding: 0 17px; color: #fff; background: var(--blue); font: 700 13px inherit; cursor: pointer; }
+button:hover { background: var(--blue-dark); }
+#taskList { list-style: none; padding: 0; margin: 0; }
+.taskItem { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-top: 1px solid var(--line); }
+.taskItem label { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; font-size: 14px; cursor: pointer; }
+.taskItem input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--blue); cursor: pointer; }
+.taskItem.completed label span { color: #9aa5b5; text-decoration: line-through; }
+.deleteTask { padding: 3px 7px; color: #a4afbd; background: transparent; font-size: 19px; line-height: 1; }
+.deleteTask:hover { color: #d35d68; background: #fff1f2; }
+.emptyState { color: var(--muted); text-align: center; font-size: 13px; padding: 14px 0 2px; }
+.calendarIcon { color: var(--blue); font-size: 24px; }
+.calendarWeek, .calendarGrid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.calendarWeek { color: var(--muted); font-size: 10px; font-weight: 700; margin: 24px 0 8px; text-align: center; }
+.calendarGrid { row-gap: 5px; }
+.calendarDay { position: relative; display: grid; place-items: center; width: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: 9px; color: var(--ink); background: transparent; font: inherit; font-size: 12px; cursor: pointer; transition: background .18s ease, transform .18s ease; }
+.calendarDay:hover:not(:disabled) { background: #eef3ff; transform: translateY(-1px); }
+.calendarDay:focus-visible, .iconButton:focus-visible, .chatToggle:focus-visible { outline: 3px solid #b8caff; outline-offset: 2px; }
+.calendarDay.isOutside { color: #c7ced8; }
+.calendarDay:disabled { cursor: default; }
+.calendarDay.isToday { color: #fff; background: var(--blue); font-weight: 800; }
+.calendarDay.hasItems::after { position: absolute; bottom: 5px; width: 4px; height: 4px; border-radius: 50%; background: #6bcfb0; content: ""; }
+.calendarDay.isToday.hasItems::after { background: #fff; }
+.calendarStatus { min-height: 16px; margin: 10px 0 0; color: #b4535c; font-size: 12px; }
+.calendarLinks { display: flex; flex-wrap: wrap; gap: 12px 18px; border-top: 1px solid var(--line); margin-top: 18px; padding-top: 15px; }
+.calendarLinks a { color: var(--blue-dark); font-size: 11px; font-weight: 700; text-decoration: none; }
+.calendarLinks a:hover { text-decoration: underline; }
+.dayDialog { width: min(92vw, 620px); max-width: none; max-height: min(90vh, 850px); padding: 0; overflow: auto; border: 1px solid rgba(230, 235, 242, .9); border-radius: 22px; color: var(--ink); background: var(--surface); box-shadow: 0 24px 80px rgba(28, 43, 70, .22); opacity: 0; transform: translateY(14px) scale(.98); transition: opacity .22s ease, transform .22s ease, overlay .22s ease allow-discrete, display .22s ease allow-discrete; }
+.dayDialog[open] { opacity: 1; transform: translateY(0) scale(1); }
+.dayDialog::backdrop { background: rgba(28, 43, 70, .28); backdrop-filter: blur(4px); opacity: 0; transition: opacity .22s ease, overlay .22s ease allow-discrete, display .22s ease allow-discrete; }
+.dayDialog[open]::backdrop { opacity: 1; }
+@starting-style {
+    .dayDialog[open] { opacity: 0; transform: translateY(14px) scale(.98); }
+    .dayDialog[open]::backdrop { opacity: 0; }
+}
+.dialogContent { padding: 26px; }
+.dialogHeader, .chatHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.iconButton { display: grid; width: 36px; height: 36px; flex: 0 0 auto; place-items: center; padding: 0; border-radius: 50%; color: var(--muted); background: #f3f6fa; font-size: 25px; font-weight: 400; line-height: 1; }
+.iconButton:hover { color: var(--ink); background: #e9eef5; }
+.calendarTaskForm { display: grid; grid-template-columns: minmax(0, 1fr) 150px; gap: 14px 12px; margin-top: 22px; padding: 18px; border: 1px solid var(--line); border-radius: 15px; background: #fbfcfe; }
+.formField { display: flex; min-width: 0; flex-direction: column; gap: 6px; }
+.formField label { color: #536278; font-size: 12px; font-weight: 700; }
+.formField input, .formField select, .formField textarea { width: 100%; min-width: 0; border: 1px solid #dfe5ed; border-radius: 8px; padding: 10px 11px; color: var(--ink); background: #fff; font: inherit; font-size: 13px; outline: none; }
+.formField textarea { resize: vertical; }
+.formField input:focus, .formField select:focus, .formField textarea:focus, .chatForm textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px #e7edff; }
+.timeFields { display: grid; grid-column: 1 / -1; grid-template-columns: 1fr 1fr; gap: 12px; }
+#calendarTaskTitle, #calendarTaskDescription { grid-column: 1; }
+.calendarTaskForm > .formField:nth-child(4), .calendarTaskForm > .formField:nth-child(5) { grid-column: 1 / -1; }
+.primaryButton { min-height: 40px; padding: 0 16px; border-radius: 9px; color: #fff; background: var(--blue); font: inherit; font-size: 13px; font-weight: 750; }
+.primaryButton:hover { background: var(--blue-dark); }
+.primaryButton:disabled { cursor: wait; opacity: .65; }
+.calendarTaskForm > .primaryButton { grid-column: 1 / -1; justify-self: end; }
+.formError { grid-column: 1 / -1; margin: 0; color: #b42332; font-size: 12px; }
+.dayAgenda { margin-top: 22px; }
+.agendaHeading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.agendaHeading h3 { margin: 0; font-size: 15px; }
+.agendaHeading span, .agendaEmpty { color: var(--muted); font-size: 12px; }
+.calendarTaskList { max-height: 220px; overflow: auto; padding: 0; margin: 0; list-style: none; }
+.calendarTaskItem { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.calendarTaskDetails { display: grid; min-width: 0; gap: 4px; }
+.calendarTaskDetails strong { overflow-wrap: anywhere; font-size: 13px; }
+.calendarTaskDetails > span { color: var(--muted); font-size: 11px; text-transform: capitalize; }
+.calendarTaskDetails p { margin: 2px 0 0; color: #536278; font-size: 12px; }
+.calendarTaskItem.completed .calendarTaskDetails strong { color: #9aa5b5; text-decoration: line-through; }
+.calendarTaskActions { display: flex; flex: 0 0 auto; gap: 5px; }
+.taskAction { padding: 6px 8px; border-radius: 7px; color: var(--blue-dark); background: #eef3ff; font: inherit; font-size: 11px; font-weight: 700; }
+.taskAction:hover { background: #dfe8ff; }
+.deleteCalendarTask { color: #a54b58; background: #fff1f2; }
+.deleteCalendarTask:hover { background: #ffe2e5; }
+.agendaEmpty { margin: 12px 0 0; text-align: center; }
+.chatWidget { position: fixed; z-index: 5; right: 24px; bottom: 24px; display: flex; align-items: flex-end; flex-direction: column; gap: 12px; }
+.chatToggle { min-height: 50px; padding: 0 20px; border-radius: 26px; background: #293d68; box-shadow: 0 9px 26px rgba(34, 54, 93, .24); font: inherit; font-size: 13px; font-weight: 750; }
+.chatToggle span { margin-right: 5px; color: #b8caff; font-size: 18px; }
+.chatPanel { display: flex; width: min(380px, calc(100vw - 32px)); height: min(540px, calc(100vh - 110px)); flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 19px; background: #fff; box-shadow: 0 20px 60px rgba(28, 43, 70, .2); animation: chatEnter .2s ease-out; }
+.chatPanel[hidden] { display: none; }
+.chatHeader { padding: 18px 18px 14px; border-bottom: 1px solid var(--line); }
+.chatHeader h2 { font-size: 18px; }
+.chatHeader .eyebrow { font-size: 9px; }
+.chatMessages { display: flex; flex: 1; flex-direction: column; gap: 10px; overflow: auto; padding: 16px; background: #fafbfd; }
+.chatBubble { max-width: 88%; padding: 10px 12px; margin: 0; border-radius: 13px; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-wrap; }
+.assistantBubble { align-self: flex-start; border: 1px solid var(--line); border-bottom-left-radius: 4px; background: #fff; }
+.userBubble { align-self: flex-end; border-bottom-right-radius: 4px; color: #fff; background: var(--blue); }
+.chatForm { display: flex; align-items: flex-end; gap: 8px; padding: 12px; border-top: 1px solid var(--line); }
+.chatForm textarea { min-width: 0; max-height: 100px; flex: 1; resize: vertical; border: 1px solid #dfe5ed; border-radius: 9px; padding: 10px; font: inherit; font-size: 13px; outline: none; }
+.chatForm .primaryButton { min-height: 38px; }
+.chatStatus { min-height: 16px; padding: 0 14px 8px; margin: 0; color: #b42332; font-size: 11px; }
+@keyframes chatEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (max-width: 700px) {
+    .siteHeader { padding: 25px 18px 22px; align-items: flex-start; }
+    .headerDate { display: none; }
+    .classHubButton { padding: 10px 12px; font-size: 12px; }
+    .dashboard { padding: 0 18px 32px; grid-template-columns: 1fr; }
+    .progressCard { grid-column: auto; }
+    .studentInfoBlock { padding: 21px; }
+    .chatWidget { right: 16px; bottom: 16px; }
+    .calendarTaskForm { grid-template-columns: 1fr; }
+    .calendarTaskForm > .formField, .calendarTaskForm > .formField:nth-child(4), .calendarTaskForm > .formField:nth-child(5) { grid-column: 1; }
+    .timeFields { grid-column: 1; }
+    .dayDialog { max-height: 92vh; border-radius: 18px; }
+    .dialogContent { padding: 20px; }
+}
+@media (max-width: 420px) {
+    .siteHeader { flex-wrap: wrap; gap: 12px; }
+    .headerActions { margin-left: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

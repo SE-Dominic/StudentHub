@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Sign Up</title>
+	<style>
+		* { box-sizing: border-box; }
+		body {
+			margin: 0;
+			min-height: 100vh;
+			display: grid;
+			place-items: center;
+			font-family: Arial, sans-serif;
+			background: #f4f6f8;
+			color: #1f2937;
+		}
+		.signup-card {
+			width: min(90%, 400px);
+			padding: 2rem;
+			background: #fff;
+			border-radius: 10px;
+			box-shadow: 0 4px 16px rgba(0, 0, 0, .1);
+		}
+		h1 { margin: 0 0 1.5rem; text-align: center; }
+		label { display: block; margin: 1rem 0 .4rem; font-weight: 600; }
+		input {
+			width: 100%;
+			padding: .75rem;
+			border: 1px solid #cbd5e1;
+			border-radius: 6px;
+			font-size: 1rem;
+		}
+		button { width: 100%; padding: .75rem; border: 0; border-radius: 6px; font-size: 1rem; cursor: pointer; }
+		.signup-button { margin-top: 1.5rem; background: #2563eb; color: #fff; }
+		.to-loginButton { margin-top: 1.5rem; background: #2563eb; color: #fff;}
+	</style>
+</head>
+<body>
+	<main class="signup-card">
+		<h1>Sign Up</h1>
+		<form id="signupForm" action="http://127.0.0.1:8000/signup" method="POST">
+			<label for="email">Email</label>
+			<input type="email" id="email" name="email" required>
+
+			<label for="password">Password</label>
+			<input type="password" id="password" name="password" required>
+
+			<button class="signup-button" type="submit">Sign up</button>
+			<button type="button" class="to-loginButton" onclick="location.href='login.html'">Go to login</button>
+		</form>
+	</main>
+	<script src="authentication.js"></script>
+</body>
+</html>

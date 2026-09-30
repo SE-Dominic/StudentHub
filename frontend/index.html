@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Student Hub</title>
+        <link rel="stylesheet" href="styles.css">
+	</head>
+	<body>
+        <header class="siteHeader">
+            <div class="brand">
+                <img id="bookButton" src="images/stackedBooks.png" alt="Stacked books">
+                <div>
+                    <p class="eyebrow">YOUR PERSONAL DASHBOARD</p>
+                    <h1>Student Hub</h1>
+                </div>
+            </div>
+            <div class="headerActions">
+                <p class="headerDate" id="headerDate"></p>
+                <a class="classHubButton" href="class-hub.html"><span aria-hidden="true">▤</span> Class Hub</a>
+            </div>
+        </header>
+
+        <main class="dashboard">
+            <section class="studentInfoBlock progressCard" id="studentProgressBlock" aria-labelledby="progressHeading">
+                <div class="cardHeading">
+                    <div>
+                        <p class="eyebrow">KEEP MOVING</p>
+                        <h2 id="progressHeading">Your progress</h2>
+                    </div>
+                    <span class="progressPercent" id="progressPercent">0%</span>
+                </div>
+                <p class="progressSummary" id="progressSummary">0 of 0 tasks completed</p>
+                <div class="progressTrack" role="progressbar" aria-labelledby="progressHeading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar">
+                    <span></span>
+                </div>
+                <p class="progressMessage" id="progressMessage">Add a task to get started.</p>
+            </section>
+
+            <section class="studentInfoBlock tasksCard" id="tasksListBlock" aria-labelledby="tasksHeading">
+                <div class="cardHeading">
+                    <div>
+                        <p class="eyebrow">STAY ON TRACK</p>
+                        <h2 id="tasksHeading">Tasks</h2>
+                    </div>
+                    <span class="taskCount" id="taskCount">0 tasks</span>
+                </div>
+                <form class="taskForm" id="taskForm">
+                    <label class="srOnly" for="taskInput">Add a task</label>
+                    <input type="text" id="taskInput" placeholder="What needs to get done?" autocomplete="off" maxlength="120">
+                    <button id="taskSubmitButton" type="submit">Add task</button>
+                </form>
+                <ul id="taskList" aria-live="polite"></ul>
+                <p class="emptyState" id="emptyState">No tasks yet. Add your first one above.</p>
+            </section>
+
+            <section class="studentInfoBlock calendarCard" id="calendarBlock" aria-labelledby="calendarHeading">
+                <div class="cardHeading">
+                    <div>
+                        <p class="eyebrow">PLAN AHEAD</p>
+                        <h2 id="calendarHeading"></h2>
+                    </div>
+                    <span class="calendarIcon" aria-hidden="true">▦</span>
+                </div>
+                <div class="calendarWeek" aria-hidden="true">
+                    <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                </div>
+                <div class="calendarGrid" id="calendarGrid"></div>
+                <p class="calendarStatus" id="calendarStatus" role="status"></p>
+                <div class="calendarLinks">
+                    <a href="https://calendar.google.com/calendar/u/0/r" target="_blank" rel="noopener">Open Google Calendar ↗</a>
+                    <a href="https://support.apple.com/guide/calendar/subscribe-to-calendars-icl1022/mac" target="_blank" rel="noopener">Connect Apple Calendar ↗</a>
+                </div>
+            </section>
+        </main>
+
+        <dialog class="dayDialog" id="dayDialog" aria-labelledby="dayDialogHeading">
+            <div class="dialogContent">
+                <header class="dialogHeader">
+                    <div>
+                        <p class="eyebrow">YOUR DAY, YOUR PLAN</p>
+                        <h2 id="dayDialogHeading">Plan your day</h2>
+                    </div>
+                    <button class="iconButton" id="closeDayDialog" type="button" aria-label="Close day planner">&times;</button>
+                </header>
+                <form class="calendarTaskForm" id="calendarTaskForm">
+                    <div class="formField">
+                        <label for="calendarTaskTitle">What are you planning?</label>
+                        <input id="calendarTaskTitle" name="title" type="text" maxlength="120" placeholder="e.g. Review lecture notes" required>
+                    </div>
+                    <div class="formField">
+                        <label for="calendarTaskKind">Type</label>
+                        <select id="calendarTaskKind" name="kind">
+                            <option value="task">Task</option>
+                            <option value="event">Event</option>
+                            <option value="reminder">Reminder</option>
+                        </select>
+                    </div>
+                    <div class="timeFields">
+                        <div class="formField">
+                            <label for="calendarStartTime">Starts</label>
+                            <input id="calendarStartTime" name="start_time" type="time">
+                        </div>
+                        <div class="formField">
+                            <label for="calendarEndTime">Ends</label>
+                            <input id="calendarEndTime" name="end_time" type="time">
+                        </div>
+                    </div>
+                    <div class="formField">
+                        <label for="calendarReminder">Reminder (optional)</label>
+                        <input id="calendarReminder" name="reminder_at" type="datetime-local">
+                    </div>
+                    <div class="formField">
+                        <label for="calendarTaskDescription">Notes (optional)</label>
+                        <textarea id="calendarTaskDescription" name="description" maxlength="1000" rows="2" placeholder="Add a little more detail"></textarea>
+                    </div>
+                    <p class="formError" id="calendarFormError" role="alert"></p>
+                    <button class="primaryButton" id="calendarTaskSubmit" type="submit">Add to this day</button>
+                </form>
+                <section class="dayAgenda" aria-labelledby="dayAgendaHeading">
+                    <div class="agendaHeading">
+                        <h3 id="dayAgendaHeading">Your plans</h3>
+                        <span id="dayItemCount">0 items</span>
+                    </div>
+                    <ul class="calendarTaskList" id="calendarTaskList"></ul>
+                    <p class="agendaEmpty" id="agendaEmpty">Nothing planned yet. Add your first item above.</p>
+                </section>
+            </div>
+        </dialog>
+
+        <section class="chatWidget" aria-label="AI study planner">
+            <div class="chatPanel" id="chatPanel" hidden>
+                <header class="chatHeader">
+                    <div>
+                        <p class="eyebrow">STUDENT HUB AI</p>
+                        <h2>Study planner</h2>
+                    </div>
+                    <button class="iconButton" id="closeChat" type="button" aria-label="Close study planner">&times;</button>
+                </header>
+                <div class="chatMessages" id="chatMessages" aria-live="polite">
+                    <p class="chatBubble assistantBubble">Hi! I can help you plan study sessions, add events, and set reminders. What would you like to organize?</p>
+                </div>
+                <form class="chatForm" id="chatForm">
+                    <label class="srOnly" for="chatInput">Message your study planner</label>
+                    <textarea id="chatInput" rows="1" maxlength="2000" placeholder="Ask me to plan something…" required></textarea>
+                    <button class="primaryButton" id="chatSubmit" type="submit">Send</button>
+                </form>
+                <p class="chatStatus" id="chatStatus" role="status"></p>
+            </div>
+            <button class="chatToggle" id="chatToggle" type="button" aria-expanded="false" aria-controls="chatPanel">
+                <span aria-hidden="true">✦</span> Plan with AI
+            </button>
+        </section>
+        <script src="index.js"></script>
+	</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Hub | Student Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="class-hub.css">
+</head>
+<body class="classHubPage">
+    <header class="siteHeader hubHeader">
+        <a class="hubBrand" href="index.html" aria-label="Student Hub dashboard">
+            <img src="images/stackedBooks.png" alt="">
+            <span><span class="eyebrow">YOUR STUDY SPACE</span><strong>Class Hub</strong></span>
+        </a>
+        <a class="dashboardLink" href="index.html">← Dashboard</a>
+    </header>
+
+    <main class="hubLayout">
+        <aside class="hubSidebar" aria-label="Classes and folders">
+            <div class="sidebarHeading">
+                <div>
+                    <p class="eyebrow">STAY ORGANIZED</p>
+                    <h1>Your classes</h1>
+                </div>
+                <button class="smallIconButton" id="showFolderForm" type="button" aria-label="Create class folder" title="Create class folder">+</button>
+            </div>
+            <button class="folderFilter isSelected" data-folder-filter="all" type="button">
+                <span class="folderGlyph" aria-hidden="true">▦</span>
+                <span>All note pages</span>
+                <span class="folderPageCount" id="allPageCount">0</span>
+            </button>
+            <div class="folderList" id="folderList"></div>
+            <button class="unfiledDrop" id="unfiledDrop" type="button" data-folder-drop="">
+                <span aria-hidden="true">↘</span> Unfiled pages
+            </button>
+            <p class="sidebarHint">Drag a note page onto a folder to organize it.</p>
+        </aside>
+
+        <section class="hubMain" aria-label="Note pages">
+            <div class="hubPageHeader">
+                <div>
+                    <p class="eyebrow">YOUR NOTEBOOK</p>
+                    <h2 id="listHeading">All note pages</h2>
+                    <p class="hubSubtitle">Create connected notes by class, subject, and sequence.</p>
+                </div>
+                <button class="createPageButton" id="createPageButton" type="button"><span aria-hidden="true">＋</span> New page</button>
+            </div>
+
+            <form class="folderCreateForm" id="folderCreateForm" hidden>
+                <h3>Create a class folder</h3>
+                <div class="folderFormFields">
+                    <label>Class name<input name="class_name" maxlength="100" placeholder="e.g. Biology 101" required></label>
+                    <label>Subject<input name="subject" maxlength="100" placeholder="e.g. Cell structure" required></label>
+                    <button class="createPageButton" type="submit">Create folder</button>
+                    <button class="quietButton" id="cancelFolderForm" type="button">Cancel</button>
+                </div>
+                <p class="hubError" id="folderError" role="alert"></p>
+            </form>
+
+            <div class="notePageGrid" id="notePageGrid"></div>
+            <div class="hubEmptyState" id="hubEmptyState">
+                <span aria-hidden="true">✎</span>
+                <h3>Your notebook starts here</h3>
+                <p>Create a class folder, then make your first page of notes.</p>
+                <button class="createPageButton" id="emptyCreatePage" type="button">Create a note page</button>
+            </div>
+
+            <section class="weekTasksPanel" aria-labelledby="weekTasksHeading">
+                <div class="weekTasksHeading">
+                    <div>
+                        <p class="eyebrow">YOUR CALENDAR</p>
+                        <h2 id="weekTasksHeading">This week's tasks</h2>
+                    </div>
+                    <span class="weekTasksCount" id="weekTasksCount">0 tasks</span>
+                </div>
+                <p class="weekTasksStatus" id="weekTasksStatus" role="status"></p>
+                <ul class="weekTasksList" id="weekTasksList" aria-live="polite"></ul>
+                <p class="weekTasksEmpty" id="weekTasksEmpty">No tasks scheduled for this week.</p>
+            </section>
+        </section>
+    </main>
+
+    <dialog class="noteEditorDialog" id="noteEditorDialog" aria-labelledby="noteEditorHeading">
+        <form class="noteEditor" id="noteEditorForm">
+            <header class="editorHeader">
+                <div>
+                    <p class="eyebrow">CLASS HUB NOTEBOOK</p>
+                    <h2 id="noteEditorHeading">New note page</h2>
+                </div>
+                <button class="smallIconButton closeEditor" id="closeNoteEditor" type="button" aria-label="Close note editor">×</button>
+            </header>
+            <div class="noteMetadata">
+                <label>Page title<input id="noteTitle" name="title" maxlength="160" placeholder="e.g. Cell membranes" required></label>
+                <label>Sequence<input id="noteSequence" name="sequence" maxlength="30" placeholder="e.g. a.1" required></label>
+                <label>Class folder<select id="noteFolder" name="folder_id"></select></label>
+            </div>
+            <div class="drawingToolbar" aria-label="Note page tools">
+                <div class="toolModeGroup" role="group" aria-label="Editing mode">
+                    <button class="toolButton" type="button" data-mode="text" aria-pressed="false" aria-label="Text box tool">▧ Text box</button>
+                    <button class="toolButton" type="button" data-mode="draw" aria-pressed="false">Draw</button>
+                </div>
+                <span class="toolHint">Choose Text box, then click on the page to place it.</span>
+                <label class="toolSelectLabel">Tool
+                    <select id="drawingTool">
+                        <option value="pen">Pen</option>
+                        <option value="line">Line</option>
+                        <option value="arrow">Arrow</option>
+                        <option value="rectangle">Rectangle</option>
+                        <option value="ellipse">Ellipse</option>
+                    </select>
+                </label>
+                <label class="toolSelectLabel">Line
+                    <select id="drawingStyle">
+                        <option value="solid">Solid</option>
+                        <option value="dashed">Dashed</option>
+                        <option value="dotted">Dotted</option>
+                    </select>
+                </label>
+                <label class="toolColorLabel">Color<input id="drawingColor" type="color" value="#4f77d9" aria-label="Drawing color"></label>
+                <button class="toolButton" id="undoDrawing" type="button">Undo</button>
+                <button class="toolButton" id="clearDrawings" type="button">Clear</button>
+            </div>
+            <div class="editorWorkspace" id="editorWorkspace" data-mode="select" aria-label="Note page canvas">
+                <div class="textBoxLayer" id="textBoxLayer" aria-label="Text boxes"></div>
+                <canvas id="noteCanvas" aria-label="Drawing canvas. Select Draw to add shapes and arrows."></canvas>
+            </div>
+            <div class="editorFooter">
+                <p class="hubError" id="editorError" role="alert"></p>
+                <p class="saveStatus" id="saveStatus" role="status">Changes are saved when you select Save page.</p>
+                <div>
+                    <button class="quietButton" id="deleteNoteButton" type="button" hidden>Delete page</button>
+                    <button class="quietButton" id="cancelNoteEditor" type="button">Cancel</button>
+                    <button class="createPageButton" id="saveNoteButton" type="submit">Save page</button>
+                </div>
+            </div>
+        </form>
+    </dialog>
+    <script src="class-hub.js"></script>
+</body>
+</html>
